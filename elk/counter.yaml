@@ -1,0 +1,29 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counter
+  namespace: default
+  labels:
+    app: counter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: counter
+  template:
+    metadata:
+      labels:
+        app: counter
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        args: [/bin/sh, -c, 'i=0; while true; do echo "$i: $(date) [$(hostname)] [$(hostname -i)]"; i=$((i+1)); sleep 5; done']
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 50m
+            memory: 5Mi

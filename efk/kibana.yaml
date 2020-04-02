@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: kibana-logging
+  name: kibana-logging
+  namespace: logging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: kibana-logging
+  template:
+    metadata:
+      labels:
+        k8s-app: kibana-logging
+    spec:
+      containers:
+      - env:
+        - name: ELASTICSEARCH_URL
+          value: http://172.30.23.33:9200
+        image: blacktop/kibana:5.2
+        #image: docker.elastic.co/kibana/kibana-oss:6.1.1
+        #image: gcr.io/google_containers/kibana:latest
+        imagePullPolicy: IfNotPresent
+        name: kibana-logging
+        ports:
+        - containerPort: 5601
+          name: ui
+          protocol: TCP
+        resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: kibana-logging
+    kubernetes.io/cluster-service: "true"
+    kubernetes.io/name: Kibana
+  name: kibana-logging
+  namespace: logging
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 5601
+  selector:
+    k8s-app: kibana-logging
+  # type: NodePort
+  type: ClusterIP
